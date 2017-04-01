@@ -10,20 +10,22 @@ var ServerApp = express();
 //var http = require('http').Server(app);
 
 var Server = ServerApp.listen(port,function(){
+    //console.log('Server Details:',Server.address());
     var servername = Server.address().address;
     console.log('ServerApp started at http://%s:%s',servername,port);
 });
 
-/*
-serverApp.listen(port,function(){
-    //console.log('ServerApp started at:'+server.address().address+':'+port);
-    console.log('ServerApp started at port:'+port);
+//To setup CORS
+ServerApp.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
 });
-*/
 
 
 //To read all users from the mongodb users collection and return it
-ServerApp.get('/getusers',function(req,res){
+ServerApp.get('/getusers',function(req,res,next){
     db.Users.find({},function(err,docs) {
         if(err){
             return console.error('Error with /getUsers:',err);
@@ -35,8 +37,7 @@ ServerApp.get('/getusers',function(req,res){
 
 
 //To read details of a particular user using query parameter
-ServerApp.get('/getuser',function(req,res){
-    //var username = req.params.username
+ServerApp.get('/getuser',function(req,res,next){
     var username = req.query.username;
     console.log('Looking up details for user:'+username);
     db.Users.find({"username":username},function(err,docs) {
